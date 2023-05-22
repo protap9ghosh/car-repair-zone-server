@@ -34,8 +34,13 @@ async function run() {
 
       app.get("/services", async (req, res) => {
          const sort = req.query.sort;
-         const query = {};
+         const search = req.query.search;
+         // console.log(search);
+         // const query = {};
          // const query = { price: { $gt: 50, $lte: 200 } };
+         // db.InspirationalWomen.find({ first_name: { $regex: /Harriet/i } });
+
+         const query = { title: { $regex: search, $options: 'i' } };
          const options = {
             sort: {
                price: sort === "ascending" ? 1 : -1,
