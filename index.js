@@ -33,10 +33,18 @@ async function run() {
       const bookingCollection = client.db("carDoctor").collection("bookings");
 
       app.get("/services", async (req, res) => {
-         const cursor = serviceCollection.find();
+         const sort = req.query.sort;
+         // const query = {};
+         const query = { price: { $gt: 50, $lte: 200 } };
+         const options = {
+            sort: {
+               price: sort === "ascending" ? 1 : -1,
+            },
+         };
+         const cursor = serviceCollection.find(query, options);
          const result = await cursor.toArray();
          res.send(result);
-         console.log(result);
+         // console.log(result);
       });
 
       app.get("/services/:id", async (req, res) => {
@@ -53,7 +61,7 @@ async function run() {
 
       // Bookings
       app.get("/bookings", async (req, res) => {
-         console.log(req.query.email);
+         // console.log(req.query.email);
          let query = {};
          if (req.query?.email) {
             query = { email: req.query.email };
@@ -64,7 +72,7 @@ async function run() {
 
       app.post("/bookings", async (req, res) => {
          const booking = req.body;
-         console.log(booking);
+         // console.log(booking);
          const result = await bookingCollection.insertOne(booking);
          res.send(result);
       });
@@ -74,7 +82,7 @@ async function run() {
          const id = req.params.id;
          const filter = { _id: new ObjectId(id) };
          const updatedBooking = req.body;
-         console.log(updatedBooking);
+         // console.log(updatedBooking);
          const updateDoc = {
             $set: {
                status: updatedBooking.status,
