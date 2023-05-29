@@ -25,6 +25,11 @@ const client = new MongoClient(uri, {
    },
 });
 
+// verify jwt
+const verifyJWT = () => {
+   console.log('hitting verify JWT');
+} 
+
 async function run() {
    try {
       // Connect the client to the server	(optional starting in v4.7)
@@ -33,6 +38,16 @@ async function run() {
       const serviceCollection = client.db("carDoctor").collection("services");
       const bookingCollection = client.db("carDoctor").collection("bookings");
 
+      // JWT
+      app.post('/jwt', (req, res) => {
+         const user = req.body;
+         console.log(user);
+         const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+         console.log(token);
+         res.send({token});
+      })
+
+      // Services Routes
       app.get("/services", async (req, res) => {
          const sort = req.query.sort;
          const search = req.query.search;
@@ -41,7 +56,7 @@ async function run() {
          // const query = { price: { $gt: 50, $lte: 200 } };
          // db.InspirationalWomen.find({ first_name: { $regex: /Harriet/i } });
 
-         const query = { title: { $regex: search, $options: 'i' } };
+         const query = { title: { $regex: search, $options: "i" } };
          const options = {
             sort: {
                price: sort === "ascending" ? 1 : -1,
@@ -65,9 +80,9 @@ async function run() {
          res.send(result);
       });
 
-      // Bookings
+      // Booking Routes
       app.get("/bookings", async (req, res) => {
-         // console.log(req.query.email);
+         // console.log(req.headers.authorization);
          let query = {};
          if (req.query?.email) {
             query = { email: req.query.email };
